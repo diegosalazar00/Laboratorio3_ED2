@@ -226,7 +226,20 @@ namespace Lab3_ED2_C2_2020
                 }
             }
             File.Delete(rutaabsarchivooriginal);
+
         }
+        private void Escribir(int escribirhasta)
+        {
+            using (var file = new FileStream(rutaabsserver + nombrearchivooperado, FileMode.Append, FileAccess.Write))
+            {
+                using (var writer=new BinaryWriter(file))
+                {
+                    writer.Write(Bufferescritura, 0, escribirhasta);
+                }
+            }
+            Bufferescritura = new byte[largobuffer];
+        }
+
         private void escribe(int escribir)
         {
             using(var file=new FileStream(rutaabsserver+nombrearchivooperado,FileMode.Append,FileAccess.Write))
@@ -238,28 +251,157 @@ namespace Lab3_ED2_C2_2020
             }
             Bufferescrituradescompresion = new char[largobuffer];
         }
-        //
-        /*
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         * 
-         */
+        //Descompresion
+        private int Tabla()
+        {
+            Bufferlectura = new byte[largobuffer];
+            var leerhasta = 0;
+            var lineatabla = "";
+
+            using (var file=new FileStream(rutaabsarchivooriginal,FileMode.Open))
+            {
+                using (var reader =new BinaryReader(file))
+                {
+                    while(reader.BaseStream.Position!=reader.BaseStream.Length)
+                    {
+                        Bufferlectura = reader.ReadBytes(largobuffer);
+                        for (int i = 0; i < Bufferlectura.Length; i++)
+                        {
+                            leerhasta++;
+                            if (Bufferlectura[i]==13)
+                            {
+                                reader.BaseStream.Position = reader.BaseStream.Length;
+                                i = largobuffer;
+                            }
+                        }
+                    }
+                    reader.BaseStream.Position = 0;
+                    lineatabla = Encoding.UTF8.GetString(reader.ReadBytes(leerhasta - 1));
+                }
+            }
+            var items = lineatabla.Split('|');
+
+            foreach (var caracteres in items)
+            {
+                char caracter = ' ';
+                if (caracteres!=""&&caracteres!=" ")
+                {
+                    var repeticion = int.Parse(caracteres.Split(' ')[1]);
+                    if (caracteres.Split(' ')[0]=="/r")
+                    {
+                        caracter = '\r';
+                    }
+                    else if (caracteres.Split(' ')[0]=="esp")
+                    {
+                        caracter = ' ';
+                    }
+                    else if (caracteres.Split(' ')[0]=="/t")
+                    {
+                        caracter = '\t';
+                    }
+                    else if (caracteres.Split(' ')[0]=="/n")
+                    {
+                        caracter = '\n';
+                    }
+                    else
+                    {
+                        caracter = Convert.ToChar(caracteres.Split(' ')[0]);
+                    }
+                    cantidadcaracteres += repeticion;
+                    var _caracteres = new Caracteres(caracter, repeticion, false);
+                    listacaracteres.Add(_caracteres);
+                }
+            }
+            foreach (var caracteres in listacaracteres)
+            {
+                caracteres.CalcularProbabilidad(cantidadcaracteres);
+            }
+            return leerhasta;
+        }
+        public void Descomprimir()
+        {
+            nombrearchivooperado = nombrearchivooriginal.Split('.')[0] + ".txt";
+            var leerdesde = Tabla() + 1;
+            generarcodigo();
+
+            Bufferlectura = new byte[largobuffer];
+
+            var lineaenbits = "";
+            var lineaauxbits = "";
+            var bitscaracter = "";
+            var borrarposicion = 0;
+            var escribiren = 0;
+            using(var file=new FileStream(rutaabsarchivooriginal,FileMode.Open))
+            {
+                using(var reader=new BinaryReader(file))
+                {
+                    while (reader.BaseStream.Position!=reader.BaseStream.Length)
+                    {
+                        Bufferlectura = reader.ReadBytes(largobuffer);
+                        foreach (var caracter in Bufferlectura)
+                        {
+                            var binario = Convert.ToString(caracter, 2);
+                            lineaenbits+= binario.PadLeft(8, '0');
+                        }
+                        var continuar = false;
+                        bitscaracter = "";
+                        while (lineaenbits.Length>0&&continuar==false)
+                        {
+                            lineaauxbits = lineaenbits;
+                            while (!dicprefijos.ContainsValue(bitscaracter)&&lineaauxbits!="")
+                            {
+                                bitscaracter += lineaauxbits.Substring(0, 1);
+                                lineaauxbits = lineaauxbits.Remove(0, 1);
+                                borrarposicion++;
+                                if (lineaauxbits==""&&!dicprefijos.ContainsValue(bitscaracter))
+                                {
+                                    borrarposicion = 0;
+                                    continuar = true;
+                                }
+
+                            }
+
+                            lineaenbits = lineaenbits.Remove(0, borrarposicion);
+                            borrarposicion = 0;
+                            char key = '\0';
+                            foreach (var item in dicprefijos)
+                            {
+                                if (item.Value==bitscaracter)
+                                {
+                                    key = item.Key;
+                                }
+                            }
+
+                            if (escribiren<largobuffer)
+                            {
+                                if (key!='\0')
+                                {
+                                    Bufferescrituradescompresion[escribiren] = key;
+                                    bitscaracter = "";
+                                    escribiren++;
+                                }
+                            }
+                            else
+                            {
+                                if (key!='\0')
+                                {
+                                    escribe(escribiren);
+                                    escribiren = 0;
+                                    Bufferescrituradescompresion[escribiren] = key;
+                                    bitscaracter = "";
+                                    escribiren++;
+                                }
+                            }
+                        }
+                        escribe(escribiren);
+                        escribiren = 0;
+                    }
+                    
+                }
+
+            }
+            File.Delete(rutaabsarchivooriginal);
+        }
+
     }
 }
