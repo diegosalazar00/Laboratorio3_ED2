@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Consola_1\Consola_1.csproj" />
+    <ProjectReference Include="..\Lab3 ED2 C2 2020\Lab3 ED2 C2 2020.csproj" />
+  </ItemGroup>
+
+
+</Project>
