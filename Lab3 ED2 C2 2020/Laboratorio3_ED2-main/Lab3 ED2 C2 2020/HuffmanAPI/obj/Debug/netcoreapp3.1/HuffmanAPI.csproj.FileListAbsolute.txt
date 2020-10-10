@@ -1,0 +1,5 @@
+C:\Users\Diego Salazar Zea\Downloads\Laboratorio3_ED2-main\Lab3 ED2 C2 2020\HuffmanAPI\obj\Debug\netcoreapp3.1\HuffmanAPI.csprojAssemblyReference.cache
+C:\Users\Diego Salazar Zea\Downloads\Laboratorio3_ED2-main\Lab3 ED2 C2 2020\HuffmanAPI\obj\Debug\netcoreapp3.1\HuffmanAPI.AssemblyInfoInputs.cache
+C:\Users\Diego Salazar Zea\Downloads\Laboratorio3_ED2-main\Lab3 ED2 C2 2020\HuffmanAPI\obj\Debug\netcoreapp3.1\HuffmanAPI.AssemblyInfo.cs
+C:\Users\Diego Salazar Zea\Downloads\Laboratorio3_ED2-main\Lab3 ED2 C2 2020\HuffmanAPI\obj\Debug\netcoreapp3.1\HuffmanAPI.csproj.CoreCompileInputs.cache
+C:\Users\Diego Salazar Zea\Downloads\Laboratorio3_ED2-main\Lab3 ED2 C2 2020\HuffmanAPI\obj\Debug\netcoreapp3.1\HuffmanAPI.MvcApplicationPartsAssemblyInfo.cache
